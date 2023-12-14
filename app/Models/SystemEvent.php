@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class SystemEvent extends Model
 {
     use HasFactory;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -41,6 +42,11 @@ class SystemEvent extends Model
         'updated_at',
     ];
 
-    // Rest of your model code...
-
+    /**
+     * Change the relationship to a standard hasMany relationship
+     */
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class, 'event_id');
+    }
 }

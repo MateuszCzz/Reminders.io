@@ -18,13 +18,14 @@ class SystemEventController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Request $request){
+    public function create(Request $request)
+    {
 
         $data = $request->json()->all();
 
         foreach ($data as $name => $events) {
             foreach ($events as $event) {
-                
+
                 SystemEvent::create([
                     'name' => $name,
                     'month' => date('m', strtotime($event['date'])),
@@ -37,6 +38,23 @@ class SystemEventController extends Controller
         return response()->json(['message' => 'System events added successfully'], 200);
     }
 
+    public function destroyAll(Request $request)
+    {
+        try {
+            $events = SystemEvent::all();
+
+            foreach ($events as $event) {
+                $event->notifications()->delete();
+                $event->delete();
+            }
+            
+            return response()->json(['message' => 'All data removed successfully'], 200);
+
+        } catch (\Exception $e) {
+
+            return response()->json(['message' => 'Failed to remove data'.$e], 500);
+        }
+    }
 
     /**
      * Store a newly created resource in storage.

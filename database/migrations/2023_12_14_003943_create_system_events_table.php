@@ -20,6 +20,7 @@ class CreateSystemEventsTable extends Migration
             $table->unsignedTinyInteger('day');
             $table->enum('type', ['name day', 'birthday', 'holiday', 'other'])->default('name day');
             $table->enum('interval', ['yearly', 'monthly', 'weekly', 'daily', 'other'])->default('yearly');
+            $table->boolean("isCustom")->default(false);
             $table->timestamps();
         });
     }

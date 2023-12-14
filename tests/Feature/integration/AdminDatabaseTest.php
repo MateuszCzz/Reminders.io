@@ -6,11 +6,13 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\SystemEvent;
+use App\Models\Notification;
+
 class AdminDatabaseTest extends TestCase{
 
     use RefreshDatabase;
 
-    public function test_adding_system_events_to_database(): void {
+    public function test_api_injecting_system_events_into_database(): void {
 
         $data = [
             "Aaron's name day" => [
@@ -54,4 +56,28 @@ class AdminDatabaseTest extends TestCase{
             }
         }
     }
+
+    public function test_api_removing_all_system_events(): void{
+
+        $systemEvents = SystemEvent::factory(5)->create();
+
+        foreach ($systemEvents as $event) {
+            Notification::factory(3)->create(['event_id' => $event->id]);
+        }
+
+        $adminUser = User::factory()->isAdmin()->create();
+        $response = $this->postJson('/api/create-token', [
+            'email' => $adminUser->email,
+            'password' => 'password',
+        ]);
+        $response->assertStatus(200);
+
+        $response = $this->withHeaders(['Authorization' => 'Bearer ' . $response->json('token')])->postJson('api/remove-system-events');
+        $response->assertStatus(200);
+
+        $this->assertDatabaseCount('system_events', 0);
+        $this->assertDatabaseCount('notifications', 0);
+
+    }
 }
+

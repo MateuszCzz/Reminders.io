@@ -24,4 +24,5 @@ Route::post('/create-token', [TokenController::class, 'createToken']);
 
 Route::middleware(['auth:sanctum', 'admin:admin-ability'])->group(function () {
     Route::post('/inject-system-events', [SystemEventController::class, 'create']);
+    Route::post('/remove-system-events', [SystemEventController::class, 'destroyAll']);
 });
