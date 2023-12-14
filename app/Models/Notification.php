@@ -19,4 +19,8 @@ class Notification extends Model
     {
         return $this->belongsTo(SystemEvent::class, 'event_id');
     }
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }

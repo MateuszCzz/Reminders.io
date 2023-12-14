@@ -23,7 +23,6 @@ class SystemEventFactory extends Factory
     public function definition()
     {
         $eventTypes = ['name day', 'birthday', 'holiday', 'anniversary', 'other'];
-        $intervalTypes = ['yearly', 'monthly', 'biweekly', 'weekly', 'daily', 'none'];
         $hasUser = $this->faker->boolean(33);
         
         return [
@@ -32,9 +31,7 @@ class SystemEventFactory extends Factory
             'month' => $this->faker->numberBetween(1, 12),
             'day' => $this->faker->numberBetween(1, 31),
             'type' => $this->faker->randomElement($eventTypes),
-            'interval' => $this->faker->randomElement($intervalTypes),
             'isCustom' => $hasUser,
-            'hour' => $this->faker->time('H:i'),
             'notification_message' => $this->faker->sentence,
             'created_at' => now(),
             'updated_at' => now(),

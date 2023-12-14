@@ -1,7 +1,7 @@
 <?php
 
 namespace Database\Factories;
-
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\SystemEvent;
 use App\Models\Notification;
@@ -20,6 +20,7 @@ class NotificationFactory extends Factory
         return [
             'message' => $this->faker->sentence,
             'event_id' => SystemEvent::factory()->create()->id,
+            'user_id' => User::factory()->create()->id,
             'wasShowed' => $this->faker->boolean,
             'wasClosed' => $this->faker->boolean,
             'notification_date' => $this->faker->dateTime,

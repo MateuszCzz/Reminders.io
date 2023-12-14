@@ -19,7 +19,6 @@ class SystemEvent extends Model
         'month',
         'day',
         'type',
-        'interval',
     ];
 
     /**
