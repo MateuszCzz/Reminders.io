@@ -17,12 +17,13 @@ class ApiTokenTest extends TestCase{
 
         //$adminUser = User::factory()->isAdmin()->create();
 
-        $response = $this->post('/login', [
+        $response = $this->postJson('/api/create-token', [
             'email' => $user->email,
             'password' => 'password',
         ]);
-
+        
         $response->assertStatus(200);
         $response->assertJsonStructure(['token']);
+
     }
 }
