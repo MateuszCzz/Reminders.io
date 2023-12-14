@@ -9,43 +9,27 @@ class SystemEvent extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     protected $fillable = [
         'name',
         'month',
         'day',
         'type',
+        'isCustom',
+        'notification_message'
     ];
 
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
     protected $casts = [
         'month' => 'integer',
         'day' => 'integer',
     ];
 
-    /**
-     * The attributes that should be mutated to dates.
-     *
-     * @var array
-     */
-    protected $dates = [
-        'created_at',
-        'updated_at',
-    ];
 
-    /**
-     * Change the relationship to a standard hasMany relationship
-     */
     public function notifications()
     {
         return $this->hasMany(Notification::class, 'event_id');
+    }
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

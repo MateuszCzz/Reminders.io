@@ -23,13 +23,17 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('/create-token', [TokenController::class, 'createToken']);
 
 Route::middleware(['auth:sanctum', 'admin:admin-ability'])->group(function () {
-    Route::post('/inject-system-events', [SystemEventController::class, 'create']);
-    Route::post('/remove-system-events', [SystemEventController::class, 'create']);
+    Route::post('/inject-system-events', [SystemEventController::class, 'jsonInjection']);
+    Route::post('/remove-system-events', [SystemEventController::class, 'destroyAll']);
 });
 
 Route::middleware(['auth:sanctum'])->group(function () {
-    Route::post('/inject-system-events', [SystemEventController::class, 'create']);
-    Route::post('/remove-system-events', [SystemEventController::class, 'destroyAll']);
+    Route::get('/system-events', [SystemEventController::class, 'index']);
+    Route::get('/system-events/non-custom', [SystemEventController::class, 'getNonCustomEvents']);
+    Route::get('/system-events/{id}', [SystemEventController::class, 'show']);
+    Route::post('/system-events', [SystemEventController::class, 'store']);
+    Route::put('/system-events/{id}', [SystemEventController::class, 'update']);
+    Route::delete('/system-events/{id}', [SystemEventController::class, 'destroy']);
 });
 
 Route::middleware(['auth:sanctum'])->group(function () {

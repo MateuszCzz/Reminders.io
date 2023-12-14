@@ -6,6 +6,9 @@ use App\Models\SystemEvent;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Relative>
+ */
 class SystemEventFactory extends Factory
 {
     /**
@@ -36,5 +39,28 @@ class SystemEventFactory extends Factory
             'created_at' => now(),
             'updated_at' => now(),
         ];
+    }
+
+    /**
+     * Define a non_custom state.
+     *
+     * @return \Illuminate\Database\Eloquent\Factories\Factory
+     */
+    public function non_custom()
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'isCustom' => false,
+            ];
+        });
+    }
+    public function custom()
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'isCustom' => true,
+                'user_id' => User::factory()->create()->id,
+            ];
+        });
     }
 }

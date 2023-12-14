@@ -10,7 +10,7 @@ use App\Models\User;
 use App\Models\Relative;
 
 
-class EventTest extends TestCase
+class NotificationTest extends TestCase
 {
     use RefreshDatabase;
     public function test_calculating_for_relative_name_day(): void{
