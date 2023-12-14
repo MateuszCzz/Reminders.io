@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('notifications', function (Blueprint $table) {
             $table->id();
-            $table->string('message');
+            $table->string('message')->nullable;
             $table->unsignedBigInteger('event_id');
             $table->unsignedBigInteger('user_id');
-            $table->dateTime('notification_date');
+            $table->date('notification_date');
             $table->boolean('wasShowed')->default(false);
             $table->boolean('wasClosed')->default(false);
             $table->timestamps();

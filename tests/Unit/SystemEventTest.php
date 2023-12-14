@@ -18,7 +18,7 @@ class SystemEventTest extends TestCase
 
         $response = $this
             ->actingAs($user)
-            ->get('api/system-events/');
+            ->get('api/ system-events/');
 
         $response->assertOk();
         $response->assertJsonCount(5, 'data');

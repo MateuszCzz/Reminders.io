@@ -5,6 +5,7 @@ use App\Http\Controllers\TokenController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RelativeController;
+use App\Http\Controllers\NotificationController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -28,18 +29,23 @@ Route::middleware(['auth:sanctum', 'admin:admin-ability'])->group(function () {
 });
 
 Route::middleware(['auth:sanctum'])->group(function () {
+//notification
+    Route::put('nameDayForRelative/{relative_id}/{user_id}', [NotificationController::class, 'nameDayForRelative']);
+    Route::post('notificationCreateFind/{userId}/{eventId}/{eventDate}', [NotificationController::class, 'createOrFindNotification']);
+    //system events
     Route::get('/system-events', [SystemEventController::class, 'index']);
     Route::get('/system-events/non-custom', [SystemEventController::class, 'getNonCustomEvents']);
     Route::get('/system-events/{id}', [SystemEventController::class, 'show']);
     Route::post('/system-events', [SystemEventController::class, 'store']);
     Route::put('/system-events/{id}', [SystemEventController::class, 'update']);
     Route::delete('/system-events/{id}', [SystemEventController::class, 'destroy']);
-});
-
-Route::middleware(['auth:sanctum'])->group(function () {
+//relatives
     Route::get('/relatives', [RelativeController::class, 'index']);
     Route::get('/relatives/{id}', [RelativeController::class, 'show']);
     Route::post('/relatives', [RelativeController::class, 'store']);
     Route::put('/relatives/{id}', [RelativeController::class, 'update']);
     Route::delete('/relatives/{id}', [RelativeController::class, 'destroy']);
 });
+
+
+

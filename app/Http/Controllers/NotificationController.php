@@ -8,6 +8,9 @@ use App\Models\SystemEvent;
 use App\Models\Relative;
 use Illuminate\Http\Request;
 use DateTime;
+use Carbon\Carbon;
+
+
 class NotificationController extends Controller
 {
     /**
@@ -18,10 +21,97 @@ class NotificationController extends Controller
         //
     }
 
+
+    public function nameDayForRelative($relativeId, $userId)
+    {
+        $relative = Relative::find($relativeId);
+
+
+        if (!$relative || !$userId || $relative->user_id != $userId) {
+            return response()->json(['error' => 'Relative or User not found'], 404);
+        }
+
+        $events = SystemEvent::where('isCustom', false)
+            ->orWhere(function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            })
+            ->where('type', 'name day')
+            ->get();
+
+        $closestEvent = null;
+        $closestDiff = PHP_INT_MAX;
+        $birthday = Carbon::parse($relative->birthday);
+        $birthday->year(now()->year)->subYear();
+        $notificationDate = null;
+        foreach ($events as $event) {
+            $eventDay = $event->day;
+            $eventMonth = $event->month;
+            $eventDate = Carbon::createFromDate(null, $eventMonth, $eventDay);
+            $eventDate->addYear();
+            $dayDifference = ($birthday->diffInDays(Carbon::parse($eventDate), false) % 365);
+
+            if ($dayDifference >= 0 && $dayDifference < $closestDiff) {
+                $closestDiff = $dayDifference;
+                $closestEvent = $event;
+                $notificationDate = $eventDate->subYear();
+            }
+        }
+
+        if ($closestEvent == null) {
+            $closestDiff = PHP_INT_MAX;
+
+            foreach ($events as $event) {
+                $eventDay = $event->day;
+                $eventMonth = $event->month;
+                $eventDate = Carbon::createFromDate(null, $eventMonth, $eventDay);
+                $eventDate->addYear();
+                $dayDifference = $birthday->diffInDays($eventDate, false);
+                if ($dayDifference)
+                    if ($dayDifference >= 0 && $dayDifference < $closestDiff && $dayDifference) {
+                        $closestDiff = $dayDifference;
+                        $closestEvent = $event;
+                    }
+            }
+        }
+
+        if ($closestEvent == null) {
+            // Bad response if no event is found
+            return response()->json(['error' => 'No name day event found'], 404);
+        }
+
+        // Create or update notification
+        $notification = NotificationController::createOrFindNotification($userId,$closestEvent->id,$eventDate);
+
+        return response()->json(['data' => $notification], 200);
+    }
+
+    public function createOrFindNotification($user_id,$event_id,$notification_date)
+    {
+        $existingNotification = Notification::where('user_id', $user_id)
+            ->where('event_id', $event_id)
+            ->where('notification_date', $notification_date)
+            ->first();
+
+        if ($existingNotification) {
+            // Notification already exists
+            return response()->json(['message' => 'Notification already exists'], 200);
+        }
+
+        $notification = Notification::create([
+            'message' => 'Your notification message here',
+            'event_id' => $event_id,
+            'user_id' => $user_id,
+            'notification_date' => $notification_date,
+            'wasShowed' => false,
+            'wasClosed' => false,
+        ]);
+
+        return response()->json(['data' => $notification], 201);
+    }
+
     public function refreshAllForUser(User $user)
     {
-        $events = SystemEvent::where('isCustom', 'no')
-            ->orWhere(function ($query) use ($user) {
+        $events = SystemEvent::where(function ($query) use ($user) {
                 $query->where('user_id', $user->id);
             })->get();
 
@@ -42,12 +132,12 @@ class NotificationController extends Controller
                         $closestEventDiff = $eventDiff;
                     }
                 } else {
-                    $this->refreshEventNotifications($event,$user);
+                    $this->refreshEventNotifications($event, $user);
                 }
             }
 
             if ($closestEvent) {
-                $this->refreshEventNotifications($closestEvent,$user);
+                $this->refreshEventNotifications($closestEvent, $user);
             }
         }
     }
@@ -58,7 +148,7 @@ class NotificationController extends Controller
         $currentYear = date('Y');
 
         $notificationDate = new DateTime("$currentYear-$eventMonth-$eventDay");
-    
+
         // Check if the notification date is in the past
         if ($notificationDate < new DateTime()) {
             $notificationDate->modify('+1 year');
@@ -68,7 +158,7 @@ class NotificationController extends Controller
             ->where('user_id', $user->id)
             ->where('scheduled_at', $notificationDate)
             ->first();
-    
+
         if (!$notification) {
             $notification = new Notification();
             $notification->event_id = $event->id;
@@ -80,7 +170,6 @@ class NotificationController extends Controller
             // Update the existing notification if needed
         }
     }
-    
 
     /**
      * Store a newly created resource in storage.
