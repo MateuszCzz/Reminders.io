@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\SystemEvent;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class SystemEventFactory extends Factory
@@ -21,12 +22,22 @@ class SystemEventFactory extends Factory
      */
     public function definition()
     {
+        $eventTypes = ['name day', 'birthday', 'holiday', 'anniversary', 'other'];
+        $intervalTypes = ['yearly', 'monthly', 'biweekly', 'weekly', 'daily', 'none'];
+        $hasUser = $this->faker->boolean(33);
+        
         return [
-            'name' => $this->faker->word,
+            'user_id' => $hasUser ? User::factory()->create()->id : null,
+            'name' => $this->faker->name,
             'month' => $this->faker->numberBetween(1, 12),
             'day' => $this->faker->numberBetween(1, 31),
-            'type' => $this->faker->randomElement(['name day', 'birthday', 'holiday', 'other']),
-            'interval' => $this->faker->randomElement(['yearly', 'monthly', 'weekly', 'daily', 'other']),
+            'type' => $this->faker->randomElement($eventTypes),
+            'interval' => $this->faker->randomElement($intervalTypes),
+            'isCustom' => $hasUser,
+            'hour' => $this->faker->time('H:i'),
+            'notification_message' => $this->faker->sentence,
+            'created_at' => now(),
+            'updated_at' => now(),
         ];
     }
 }

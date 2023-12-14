@@ -15,14 +15,15 @@ return new class extends Migration
             $table->id();
             $table->string('message');
             $table->unsignedBigInteger('event_id');
+            $table->dateTime('notification_date');
             $table->boolean('wasShowed')->default(false);
             $table->boolean('wasClosed')->default(false);
-            $table->string('type')->default("yearly");
             $table->timestamps();
-
+    
             $table->foreign('event_id')->references('id')->on('system_events')->onDelete('cascade');
         });
     }
+    
 
     /**
      * Reverse the migrations.

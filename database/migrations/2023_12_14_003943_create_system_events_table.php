@@ -18,12 +18,17 @@ class CreateSystemEventsTable extends Migration
             $table->string('name');
             $table->unsignedTinyInteger('month');
             $table->unsignedTinyInteger('day');
-            $table->enum('type', ['name day', 'birthday', 'holiday', 'other'])->default('name day');
-            $table->enum('interval', ['yearly', 'monthly', 'weekly', 'daily', 'other'])->default('yearly');
+            $table->enum('type', ['name day', 'birthday', 'holiday', 'anniversary', 'other'])->default('name day');
+            $table->enum('interval', ['yearly', 'monthly', 'biweekly', 'weekly', 'daily', 'none'])->default('yearly');
             $table->boolean("isCustom")->default(false);
+            $table->time('hour')->default('00:00')->nullable();;
+            $table->string('notification_message')->nullable();
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
         });
     }
+    
 
     /**
      * Reverse the migrations.

@@ -60,7 +60,6 @@ class AdminDatabaseTest extends TestCase{
     public function test_api_removing_all_system_events(): void{
 
         $systemEvents = SystemEvent::factory(5)->create();
-
         foreach ($systemEvents as $event) {
             Notification::factory(3)->create(['event_id' => $event->id]);
         }

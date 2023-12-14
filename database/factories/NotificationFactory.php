@@ -22,6 +22,9 @@ class NotificationFactory extends Factory
             'event_id' => SystemEvent::factory()->create()->id,
             'wasShowed' => $this->faker->boolean,
             'wasClosed' => $this->faker->boolean,
+            'notification_date' => $this->faker->dateTime,
+            'created_at' => now(),
+            'updated_at' => now(),
         ];
     }
 }
