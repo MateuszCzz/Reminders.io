@@ -24,7 +24,7 @@ class TokenController extends Controller
             $tokenAbilities = [];
 
             if ($user->isAdmin) {
-                $tokenAbilities[] = 'admin';
+                $tokenAbilities[] = 'admin-ability';
             }
 
             $token = $user->createToken('token-name', $tokenAbilities)->plainTextToken;
