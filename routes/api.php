@@ -32,6 +32,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
 //notification
     Route::put('nameDayForRelative/{relative_id}/{user_id}', [NotificationController::class, 'nameDayForRelative']);
     Route::post('notificationCreateFind/{userId}/{eventId}/{eventDate}', [NotificationController::class, 'createOrFindNotification']);
+    Route::post('createNotificationsForUser/{userId}', [NotificationController::class, 'createNotificationsForUser']);
+
     //system events
     Route::get('/system-events', [SystemEventController::class, 'index']);
     Route::get('/system-events/non-custom', [SystemEventController::class, 'getNonCustomEvents']);

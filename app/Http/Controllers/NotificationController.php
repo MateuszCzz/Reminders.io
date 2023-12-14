@@ -102,44 +102,31 @@ class NotificationController extends Controller
             'event_id' => $event_id,
             'user_id' => $user_id,
             'notification_date' => $notification_date,
-            'wasShowed' => false,
-            'wasClosed' => false,
         ]);
 
         return response()->json(['data' => $notification], 201);
     }
 
-    public function refreshAllForUser(User $user)
+    public function createNotificationsForUser($userId)
     {
-        $events = SystemEvent::where(function ($query) use ($user) {
-                $query->where('user_id', $user->id);
-            })->get();
+        $user = User::findOrFail($userId);
+        //get all non costum events and this user events
+        $events = SystemEvent::where(function ($query) use ($userId) {
+            $query->where('isCustom', true)
+                  ->where('user_id', $userId)
+                  ->orWhere('isCustom', false);
+        })->get();
 
-        $relatives = Relative::where('user_id', $user->id)->get();
+        $startYear = Carbon::now()->year;
+        $endYear = $startYear + 5;
 
-        foreach ($relatives as $relative) {
-            $closestEvent = null;
-            $closestEventDiff = 367;
-
-            foreach ($events as $event) {
-                if ($event->type == 'name day') {
-                    $eventDate = $event->scheduled_at;
-                    $nextBirthday = $relative->birthday->copy()->addDay();
-                    $eventDiff = $eventDate->diffInDays($nextBirthday, false);
-
-                    if ($eventDiff >= 0 && $eventDiff < $closestEventDiff) {
-                        $closestEvent = $event;
-                        $closestEventDiff = $eventDiff;
-                    }
-                } else {
-                    $this->refreshEventNotifications($event, $user);
-                }
+        foreach ($events as $event) {
+            for ($year = $startYear; $year <= $endYear; $year++) {
+                $this->createOrFindNotification($user->id, $event->id, Carbon::create($year, $event->month, $event->day)->toDateString());
             }
 
-            if ($closestEvent) {
-                $this->refreshEventNotifications($closestEvent, $user);
-            }
         }
+        return response()->json(['message' => 'Notifications created for user'], 200);
     }
     private function refreshEventNotifications($event, $user)
     {

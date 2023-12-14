@@ -87,4 +87,36 @@ class NotificationTest extends TestCase
         $this->actingAs($user)->postJson("api/notificationCreateFind/{$user->id}/{$event->id}/{$notificationDate}", [
         ])->assertStatus(200);
     }
+    public function test_create_notifications_for_user()
+    {
+        $user = User::factory()->create();
+        //user event
+        SystemEvent::factory()->create([
+            'user_id' => $user->id,
+            'isCustom' => 1,
+            'type' => 'name day',
+            'name' => 'test1',
+            'notification_message' => 'Custom event message',
+        ]);
+        //system event
+        SystemEvent::factory()->create([
+            'isCustom' => 0,
+            'type' => 'name day',
+            'name' => 'test2',
+            'user_id' => $user->id,
+            'notification_message' => 'Non-custom event message',
+        ]);
+        //other user event
+        SystemEvent::factory()->create([
+            'isCustom' => 1,
+            'type' => 'name day',
+            'name' => 'test3',
+            'user_id' => User::factory()->create()->id,
+            'notification_message' => 'Non-custom event message',
+        ]);
+        $this->actingAs($user)->postJson('api/createNotificationsForUser/' . $user->id);
+
+        // Assert that the custom event creates notifications for 6 years (current year + 5 future years) x2
+        $this->assertDatabaseCount('notifications', 12);
+    }
 }
