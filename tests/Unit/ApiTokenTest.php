@@ -26,4 +26,22 @@ class ApiTokenTest extends TestCase{
         $response->assertJsonStructure(['token']);
 
     }
+    public function test_creating_new_admin_token(): void{
+
+        $adminUser = User::factory()->isAdmin()->create();
+
+        $response = $this->postJson('/api/create-token', [
+            'email' => $adminUser->email,
+            'password' => 'password',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJsonStructure(['token']);
+        
+        $token = $response->json('token');
+        $abilities = \Laravel\Sanctum\PersonalAccessToken::findToken($token)->abilities;
+        
+        $this->assertTrue(in_array('admin', $abilities));
+
+    }
 }

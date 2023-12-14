@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class TokenController extends Controller{
-    
-    public function createToken(Request $request){
+class TokenController extends Controller
+{
+
+    public function createToken(Request $request)
+    {
 
         $request->validate([
             'email' => ['required', 'string', 'email'],
@@ -18,7 +20,7 @@ class TokenController extends Controller{
 
         if (Auth::attempt($credentials, false)) {
             $user = $request->user();
-            
+
             $tokenAbilities = [];
 
             if ($user->isAdmin) {
@@ -28,6 +30,6 @@ class TokenController extends Controller{
             $token = $user->createToken('token-name', $tokenAbilities)->plainTextToken;
 
             return response()->json(['token' => $token]);
+        }
     }
-}
 }
